@@ -227,7 +227,7 @@ body {
     font-size: 0.95rem;
 }
 
-.mac-address, .beacon-uuid {
+.mac-address, .beacon-uuid, .beacon-password {
     background: #f1f8ff;
     border: 2px solid #2196F3;
     border-radius: 10px;
@@ -245,6 +245,13 @@ body {
     background: #f8f4ff;
     border-color: #9C27B0;
     color: #7B1FA2;
+    font-size: 1rem;
+}
+
+.beacon-password {
+    background: #fff8e1;
+    border-color: #FF9800;
+    color: #E65100;
     font-size: 1rem;
 }
 

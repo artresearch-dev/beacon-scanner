@@ -28,7 +28,7 @@
         <!-- Header -->
         <header class="app-header">
             <h1>🔍 Beacon Scanner</h1>
-            <p>Scan QR codes to get beacon MAC addresses and UUID</p>
+            <p>Scan QR codes to get beacon information (MAC, UUID, Password)</p>
         </header>
 
         <!-- Camera Section -->
@@ -67,6 +67,14 @@
                     <div class="beacon-uuid" id="beaconUuid">D546DF97475747EFBE093E2DCBDD0C77</div>
                     <button id="copyUuidBtn" class="btn btn-success">📋 Copy UUID</button>
                     <div class="copy-feedback" id="copyUuidFeedback"></div>
+                </div>
+
+                <!-- Password -->
+                <div class="result-item">
+                    <label>Default Password:</label>
+                    <div class="beacon-password" id="beaconPassword">AA1406111200</div>
+                    <button id="copyPasswordBtn" class="btn btn-success">📋 Copy Password</button>
+                    <div class="copy-feedback" id="copyPasswordFeedback"></div>
                 </div>
             </div>
         </div>

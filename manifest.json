@@ -1,7 +1,7 @@
 {
     "name": "BLE Beacon QR Scanner",
     "short_name": "BeaconScanner",
-    "description": "Scan QR codes to get BLE beacon MAC addresses and UUID",
+    "description": "Scan QR codes to get BLE beacon information: MAC address, UUID, and default password",
     "start_url": "./",
     "display": "standalone",
     "background_color": "#ffffff",

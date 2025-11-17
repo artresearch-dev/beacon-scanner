@@ -8,13 +8,16 @@ class BeaconScannerApp {
         this.stopBtn = document.getElementById('stopBtn');
         this.copyMacBtn = document.getElementById('copyMacBtn');
         this.copyUuidBtn = document.getElementById('copyUuidBtn');
+        this.copyPasswordBtn = document.getElementById('copyPasswordBtn');
         this.resultsContainer = document.getElementById('resultsContainer');
         this.errorContainer = document.getElementById('errorContainer');
         this.macAddressElement = document.getElementById('macAddress');
         this.beaconUuidElement = document.getElementById('beaconUuid');
+        this.beaconPasswordElement = document.getElementById('beaconPassword');
         this.errorMessage = document.getElementById('errorMessage');
         this.copyMacFeedback = document.getElementById('copyMacFeedback');
         this.copyUuidFeedback = document.getElementById('copyUuidFeedback');
+        this.copyPasswordFeedback = document.getElementById('copyPasswordFeedback');
         this.cameraContainer = document.getElementById('cameraContainer');
         
         this.initializeEventListeners();
@@ -36,6 +39,7 @@ class BeaconScannerApp {
         this.stopBtn.addEventListener('click', () => this.stopScanning());
         this.copyMacBtn.addEventListener('click', () => this.copyMACAddress());
         this.copyUuidBtn.addEventListener('click', () => this.copyUUID());
+        this.copyPasswordBtn.addEventListener('click', () => this.copyPassword());
 
         // Handle page visibility changes (pause scanning when app is hidden)
         document.addEventListener('visibilitychange', () => {
@@ -250,6 +254,28 @@ class BeaconScannerApp {
         } catch (error) {
             console.error('Copy UUID failed:', error);
             this.showCopyFeedback(this.copyUuidFeedback, false, 'Copy failed. Please copy manually.');
+        }
+    }
+
+    async copyPassword() {
+        const password = 'AA1406111200';
+
+        try {
+            const result = await clipboardManager.copyToClipboard(password);
+            
+            if (result.success) {
+                this.showCopyFeedback(this.copyPasswordFeedback, true, '✅ Password copied!');
+                
+                // Trigger haptic feedback if available
+                if (navigator.vibrate) {
+                    navigator.vibrate(100);
+                }
+            } else {
+                this.showCopyFeedback(this.copyPasswordFeedback, false, result.error || 'Failed to copy password');
+            }
+        } catch (error) {
+            console.error('Copy password failed:', error);
+            this.showCopyFeedback(this.copyPasswordFeedback, false, 'Copy failed. Please copy manually.');
         }
     }
 
