@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLE Beacon QR Scanner</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2196F3">
+    <meta name="description" content="Scan QR codes to get BLE beacon MAC addresses">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Beacon Scanner">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>🔍 Beacon Scanner</h1>
+            <p>Scan QR codes to get beacon MAC addresses</p>
+        </header>
+
+        <!-- Camera Section -->
+        <div class="camera-container" id="cameraContainer">
+            <video id="qrVideo" autoplay muted playsinline></video>
+            <div class="scanner-overlay">
+                <div class="scanner-frame"></div>
+                <div class="scanner-instructions">
+                    Point camera at QR code
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button id="startBtn" class="btn btn-primary">Start Scanner</button>
+            <button id="stopBtn" class="btn btn-secondary" style="display: none;">Stop Scanner</button>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-container" id="resultsContainer" style="display: none;">
+            <div class="result-card">
+                <h3>MAC Address Found:</h3>
+                <div class="mac-address" id="macAddress"></div>
+                <button id="copyBtn" class="btn btn-success">📋 Copy to Clipboard</button>
+                <div class="copy-feedback" id="copyFeedback"></div>
+            </div>
+        </div>
+
+        <!-- Error Messages -->
+        <div class="error-container" id="errorContainer" style="display: none;">
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>BLE Beacon QR Scanner v1.0</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script src="js/clipboard.js"></script>
+    <script src="js/qr-scanner.js"></script>
+    <script src="js/app.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
