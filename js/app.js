@@ -43,7 +43,7 @@ class BeaconScannerApp {
         });
     }
 
-    checkCompatibility() {
+    async checkCompatibility() {
         if (!QRScanner.isSupported()) {
             this.showError('Your browser does not support camera access or QR code scanning. Please use a modern mobile browser.');
             this.startBtn.disabled = true;
@@ -52,6 +52,20 @@ class BeaconScannerApp {
 
         if (!clipboardManager.isClipboardSupported()) {
             console.warn('Clipboard functionality may not be available');
+        }
+
+        // Check detailed camera support
+        try {
+            const support = await QRScanner.checkCameraSupport();
+            console.log('Camera support details:', support);
+            
+            if (support.cameras.length === 0) {
+                this.showError('No cameras detected. Please ensure your device has a camera and try again.');
+                this.startBtn.disabled = true;
+                return;
+            }
+        } catch (error) {
+            console.warn('Could not check camera support:', error);
         }
 
         this.showCameraPlaceholder();
@@ -78,26 +92,36 @@ class BeaconScannerApp {
             this.startBtn.disabled = true;
 
             // Show loading state
-            this.stopBtn.innerHTML = '<span class="loading-spinner"></span> Initializing...';
+            this.stopBtn.innerHTML = '<span class="loading-spinner"></span> Initializing Camera...';
 
             // Request camera permission and start scanning
-            await this.scanner.requestCameraPermission();
+            const cameraInitialized = await this.scanner.requestCameraPermission();
+            
+            if (!cameraInitialized) {
+                throw new Error('Failed to initialize camera');
+            }
             
             // Restore camera container if it was replaced
             if (!document.getElementById('qrVideo')) {
                 this.restoreCameraContainer();
             }
             
-            this.scanner.startScanning();
+            // Update button to show camera is loading
+            this.stopBtn.innerHTML = '<span class="loading-spinner"></span> Starting Camera...';
             
-            // Update stop button
-            this.stopBtn.innerHTML = 'Stop Scanner';
-            
-            console.log('Scanning started successfully');
+            // Small delay to ensure video element is ready
+            setTimeout(() => {
+                this.scanner.startScanning();
+                
+                // Update stop button
+                this.stopBtn.innerHTML = 'Stop Scanner';
+                
+                console.log('Scanning started successfully');
+            }, 500);
 
         } catch (error) {
             console.error('Failed to start scanning:', error);
-            this.showError(error.message || 'Failed to access camera');
+            this.showError(error.message || 'Failed to access camera. Please check permissions and try again.');
             this.resetButtonStates();
         }
     }

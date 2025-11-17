@@ -13,27 +13,68 @@ class QRScanner {
 
     async requestCameraPermission() {
         try {
-            // Request camera permission with mobile-optimized constraints
-            const constraints = {
-                video: {
-                    facingMode: { ideal: 'environment' }, // Use back camera on mobile
-                    width: { ideal: 1280, max: 1920 },
-                    height: { ideal: 720, max: 1080 },
-                    aspectRatio: { ideal: 16/9 }
+            // Try different constraint configurations for better mobile compatibility
+            const constraintOptions = [
+                // Option 1: Environment camera with flexible constraints
+                {
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 640, max: 1920 },
+                        height: { ideal: 480, max: 1080 }
+                    }
+                },
+                // Option 2: Basic environment camera
+                {
+                    video: {
+                        facingMode: 'environment'
+                    }
+                },
+                // Option 3: Any camera (fallback)
+                {
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                },
+                // Option 4: Minimal constraints
+                {
+                    video: true
                 }
-            };
+            ];
 
-            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-            this.video.srcObject = this.stream;
-            
-            return new Promise((resolve) => {
-                this.video.onloadedmetadata = () => {
-                    resolve(true);
-                };
-            });
+            let lastError = null;
+
+            for (const constraints of constraintOptions) {
+                try {
+                    console.log('Trying camera constraints:', constraints);
+                    this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    this.video.srcObject = this.stream;
+                    
+                    return new Promise((resolve) => {
+                        this.video.onloadedmetadata = () => {
+                            console.log('Camera initialized successfully');
+                            console.log('Video dimensions:', this.video.videoWidth, 'x', this.video.videoHeight);
+                            resolve(true);
+                        };
+                        
+                        // Add error handling for video element
+                        this.video.onerror = (e) => {
+                            console.error('Video element error:', e);
+                            resolve(false);
+                        };
+                    });
+                } catch (error) {
+                    console.warn('Failed with constraints:', constraints, error);
+                    lastError = error;
+                    continue;
+                }
+            }
+
+            throw lastError || new Error('Unable to access camera with any configuration');
+
         } catch (error) {
             console.error('Camera access denied:', error);
-            throw new Error('Camera access is required to scan QR codes. Please allow camera access and try again.');
+            throw new Error(`Camera access failed: ${error.message}. Please ensure you've granted camera permissions and try again.`);
         }
     }
 
@@ -41,8 +82,26 @@ class QRScanner {
         if (this.scanning) return;
         
         this.scanning = true;
-        this.video.play();
-        this.scanLoop();
+        
+        // Wait for video to be ready before starting scan loop
+        const startScanLoop = () => {
+            if (this.video.readyState >= 2) { // HAVE_CURRENT_DATA or better
+                console.log('Video ready, starting scan loop');
+                this.scanLoop();
+            } else {
+                console.log('Waiting for video data...');
+                setTimeout(startScanLoop, 100);
+            }
+        };
+
+        this.video.play().then(() => {
+            console.log('Video playing successfully');
+            startScanLoop();
+        }).catch((error) => {
+            console.error('Video play failed:', error);
+            // Try to start anyway
+            startScanLoop();
+        });
     }
 
     stopScanning() {
@@ -174,6 +233,27 @@ class QRScanner {
             navigator.mediaDevices.getUserMedia &&
             window.jsQR
         );
+    }
+
+    // Enhanced browser compatibility check
+    static async checkCameraSupport() {
+        const support = {
+            mediaDevices: !!navigator.mediaDevices,
+            getUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+            jsQR: !!window.jsQR,
+            cameras: []
+        };
+
+        if (support.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                support.cameras = devices.filter(device => device.kind === 'videoinput');
+            } catch (error) {
+                console.warn('Could not enumerate devices:', error);
+            }
+        }
+
+        return support;
     }
 
     // Get camera capabilities for debugging

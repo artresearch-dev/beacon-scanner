@@ -1,0 +1,12 @@
+# GitHub Pages Deployment Commands
+
+## After creating your GitHub repository, run these commands:
+
+# Add your GitHub repository as origin (replace YOUR-USERNAME with your actual GitHub username)
+git remote add origin https://github.com/YOUR-USERNAME/beacon-scanner.git
+
+# Push your code to GitHub
+git branch -M main
+git push -u origin main
+
+## Then follow the GitHub Pages setup instructions below
