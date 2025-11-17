@@ -26,7 +26,7 @@
         <!-- Header -->
         <header class="app-header">
             <h1>🔍 Beacon Scanner</h1>
-            <p>Scan QR codes to get beacon MAC addresses</p>
+            <p>Scan QR codes to get beacon MAC addresses and UUID</p>
         </header>
 
         <!-- Camera Section -->
@@ -49,10 +49,23 @@
         <!-- Results Section -->
         <div class="results-container" id="resultsContainer" style="display: none;">
             <div class="result-card">
-                <h3>MAC Address Found:</h3>
-                <div class="mac-address" id="macAddress"></div>
-                <button id="copyBtn" class="btn btn-success">📋 Copy to Clipboard</button>
-                <div class="copy-feedback" id="copyFeedback"></div>
+                <h3>Beacon Information:</h3>
+                
+                <!-- MAC Address -->
+                <div class="result-item">
+                    <label>MAC Address:</label>
+                    <div class="mac-address" id="macAddress"></div>
+                    <button id="copyMacBtn" class="btn btn-success">📋 Copy MAC Address</button>
+                    <div class="copy-feedback" id="copyMacFeedback"></div>
+                </div>
+
+                <!-- UUID -->
+                <div class="result-item">
+                    <label>Beacon UUID:</label>
+                    <div class="beacon-uuid" id="beaconUuid">D546DF97475747EFBE093E2DCBDD0C77</div>
+                    <button id="copyUuidBtn" class="btn btn-success">📋 Copy UUID</button>
+                    <div class="copy-feedback" id="copyUuidFeedback"></div>
+                </div>
             </div>
         </div>
 

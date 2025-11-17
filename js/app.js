@@ -6,12 +6,15 @@ class BeaconScannerApp {
         // Initialize DOM elements
         this.startBtn = document.getElementById('startBtn');
         this.stopBtn = document.getElementById('stopBtn');
-        this.copyBtn = document.getElementById('copyBtn');
+        this.copyMacBtn = document.getElementById('copyMacBtn');
+        this.copyUuidBtn = document.getElementById('copyUuidBtn');
         this.resultsContainer = document.getElementById('resultsContainer');
         this.errorContainer = document.getElementById('errorContainer');
         this.macAddressElement = document.getElementById('macAddress');
+        this.beaconUuidElement = document.getElementById('beaconUuid');
         this.errorMessage = document.getElementById('errorMessage');
-        this.copyFeedback = document.getElementById('copyFeedback');
+        this.copyMacFeedback = document.getElementById('copyMacFeedback');
+        this.copyUuidFeedback = document.getElementById('copyUuidFeedback');
         this.cameraContainer = document.getElementById('cameraContainer');
         
         this.initializeEventListeners();
@@ -31,7 +34,8 @@ class BeaconScannerApp {
         // Button event listeners
         this.startBtn.addEventListener('click', () => this.startScanning());
         this.stopBtn.addEventListener('click', () => this.stopScanning());
-        this.copyBtn.addEventListener('click', () => this.copyMACAddress());
+        this.copyMacBtn.addEventListener('click', () => this.copyMACAddress());
+        this.copyUuidBtn.addEventListener('click', () => this.copyUUID());
 
         // Handle page visibility changes (pause scanning when app is hidden)
         document.addEventListener('visibilitychange', () => {
@@ -204,7 +208,7 @@ class BeaconScannerApp {
 
     async copyMACAddress() {
         if (!this.currentMacAddress) {
-            this.showCopyFeedback(false, 'No MAC address to copy');
+            this.showCopyFeedback(this.copyMacFeedback, false, 'No MAC address to copy');
             return;
         }
 
@@ -212,18 +216,40 @@ class BeaconScannerApp {
             const result = await clipboardManager.copyToClipboard(this.currentMacAddress);
             
             if (result.success) {
-                this.showCopyFeedback(true, '✅ Copied to clipboard!');
+                this.showCopyFeedback(this.copyMacFeedback, true, '✅ MAC address copied!');
                 
                 // Trigger haptic feedback if available
                 if (navigator.vibrate) {
                     navigator.vibrate(100);
                 }
             } else {
-                this.showCopyFeedback(false, result.error || 'Failed to copy');
+                this.showCopyFeedback(this.copyMacFeedback, false, result.error || 'Failed to copy MAC address');
             }
         } catch (error) {
-            console.error('Copy failed:', error);
-            this.showCopyFeedback(false, 'Copy failed. Please copy manually.');
+            console.error('Copy MAC failed:', error);
+            this.showCopyFeedback(this.copyMacFeedback, false, 'Copy failed. Please copy manually.');
+        }
+    }
+
+    async copyUUID() {
+        const uuid = 'D546DF97475747EFBE093E2DCBDD0C77';
+
+        try {
+            const result = await clipboardManager.copyToClipboard(uuid);
+            
+            if (result.success) {
+                this.showCopyFeedback(this.copyUuidFeedback, true, '✅ UUID copied!');
+                
+                // Trigger haptic feedback if available
+                if (navigator.vibrate) {
+                    navigator.vibrate(100);
+                }
+            } else {
+                this.showCopyFeedback(this.copyUuidFeedback, false, result.error || 'Failed to copy UUID');
+            }
+        } catch (error) {
+            console.error('Copy UUID failed:', error);
+            this.showCopyFeedback(this.copyUuidFeedback, false, 'Copy failed. Please copy manually.');
         }
     }
 
@@ -245,8 +271,8 @@ class BeaconScannerApp {
         this.errorContainer.style.display = 'none';
     }
 
-    showCopyFeedback(success, message) {
-        showCopyFeedback(this.copyFeedback, success, message);
+    showCopyFeedback(feedbackElement, success, message) {
+        showCopyFeedback(feedbackElement, success, message);
     }
 }
 
