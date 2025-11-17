@@ -94,30 +94,44 @@ class BeaconScannerApp {
             // Show loading state
             this.stopBtn.innerHTML = '<span class="loading-spinner"></span> Initializing Camera...';
 
+            // Ensure video element exists and is connected
+            let videoElement = document.getElementById('qrVideo');
+            if (!videoElement) {
+                console.log('Restoring camera container...');
+                this.restoreCameraContainer();
+                videoElement = document.getElementById('qrVideo');
+            }
+            
+            if (!videoElement) {
+                throw new Error('Could not create video element');
+            }
+
+            // Make sure scanner has the video element
+            this.scanner.video = videoElement;
+            console.log('Video element ready:', videoElement);
+
             // Request camera permission and start scanning
+            this.stopBtn.innerHTML = '<span class="loading-spinner"></span> Requesting Camera...';
+            
             const cameraInitialized = await this.scanner.requestCameraPermission();
             
             if (!cameraInitialized) {
                 throw new Error('Failed to initialize camera');
             }
             
-            // Restore camera container if it was replaced
-            if (!document.getElementById('qrVideo')) {
-                this.restoreCameraContainer();
-            }
-            
             // Update button to show camera is loading
-            this.stopBtn.innerHTML = '<span class="loading-spinner"></span> Starting Camera...';
+            this.stopBtn.innerHTML = '<span class="loading-spinner"></span> Starting Scanner...';
             
-            // Small delay to ensure video element is ready
+            // Small delay to ensure video stream is ready
             setTimeout(() => {
+                console.log('Starting scan loop...');
                 this.scanner.startScanning();
                 
                 // Update stop button
                 this.stopBtn.innerHTML = 'Stop Scanner';
                 
                 console.log('Scanning started successfully');
-            }, 500);
+            }, 1000);
 
         } catch (error) {
             console.error('Failed to start scanning:', error);
@@ -166,8 +180,14 @@ class BeaconScannerApp {
             </div>
         `;
         
-        // Update video reference
-        this.scanner.video = document.getElementById('qrVideo');
+        // Update video reference and ensure it's connected
+        const newVideo = document.getElementById('qrVideo');
+        if (newVideo) {
+            this.scanner.video = newVideo;
+            console.log('Video element restored and connected');
+        } else {
+            console.error('Failed to restore video element');
+        }
     }
 
     handleMACAddressDetected(macAddress) {

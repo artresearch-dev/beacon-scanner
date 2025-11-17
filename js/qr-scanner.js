@@ -48,20 +48,48 @@ class QRScanner {
                 try {
                     console.log('Trying camera constraints:', constraints);
                     this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    
+                    // Make sure video element exists
+                    if (!this.video) {
+                        console.error('Video element not found');
+                        throw new Error('Video element not available');
+                    }
+                    
+                    console.log('Setting video srcObject...');
                     this.video.srcObject = this.stream;
                     
-                    return new Promise((resolve) => {
+                    return new Promise((resolve, reject) => {
+                        const timeoutId = setTimeout(() => {
+                            console.error('Video loading timeout');
+                            reject(new Error('Video loading timeout'));
+                        }, 10000);
+
                         this.video.onloadedmetadata = () => {
+                            clearTimeout(timeoutId);
                             console.log('Camera initialized successfully');
                             console.log('Video dimensions:', this.video.videoWidth, 'x', this.video.videoHeight);
+                            console.log('Video ready state:', this.video.readyState);
                             resolve(true);
+                        };
+                        
+                        this.video.onloadeddata = () => {
+                            console.log('Video data loaded');
                         };
                         
                         // Add error handling for video element
                         this.video.onerror = (e) => {
+                            clearTimeout(timeoutId);
                             console.error('Video element error:', e);
-                            resolve(false);
+                            reject(new Error('Video element error'));
                         };
+
+                        // Force load if it doesn't happen automatically
+                        setTimeout(() => {
+                            if (this.video.readyState === 0) {
+                                console.log('Forcing video load...');
+                                this.video.load();
+                            }
+                        }, 1000);
                     });
                 } catch (error) {
                     console.warn('Failed with constraints:', constraints, error);
@@ -127,6 +155,13 @@ class QRScanner {
             this.canvas.height = this.video.videoHeight;
             this.canvas.width = this.video.videoWidth;
 
+            // Debug video dimensions
+            if (this.canvas.width === 0 || this.canvas.height === 0) {
+                console.warn('Video dimensions are zero:', this.video.videoWidth, 'x', this.video.videoHeight);
+                console.warn('Video ready state:', this.video.readyState);
+                console.warn('Video current time:', this.video.currentTime);
+            }
+
             this.context.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
             
             const imageData = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
@@ -138,6 +173,8 @@ class QRScanner {
                 this.handleQRCodeDetected(qrCode.data);
                 return; // Stop scanning after successful detection
             }
+        } else {
+            console.log('Video not ready, state:', this.video.readyState);
         }
 
         this.animationFrame = requestAnimationFrame(() => this.scanLoop());
