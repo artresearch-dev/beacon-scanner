@@ -1,0 +1,7 @@
+# After you create the PNG icons, run these commands:
+
+git add icons/*.png
+git commit -m "Add PWA icons for iPhone home screen"
+git push origin main
+
+# Then wait 2-3 minutes and re-add the PWA to your iPhone home screen
