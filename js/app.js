@@ -19,6 +19,10 @@ class BeaconScannerApp {
         this.copyUuidFeedback = document.getElementById('copyUuidFeedback');
         this.copyPasswordFeedback = document.getElementById('copyPasswordFeedback');
         this.cameraContainer = document.getElementById('cameraContainer');
+        this.clearBtn = document.getElementById('clearBtn');
+        this.zoomControls = document.getElementById('zoomControls');
+        this.zoomSlider = document.getElementById('zoomSlider');
+        this.zoomValueLabel = document.getElementById('zoomValue');
         
         this.initializeEventListeners();
         this.checkCompatibility();
@@ -40,6 +44,14 @@ class BeaconScannerApp {
         this.copyMacBtn.addEventListener('click', () => this.copyMACAddress());
         this.copyUuidBtn.addEventListener('click', () => this.copyUUID());
         this.copyPasswordBtn.addEventListener('click', () => this.copyPassword());
+        this.clearBtn.addEventListener('click', () => this.clearFields());
+
+        // Zoom slider
+        this.zoomSlider.addEventListener('input', () => {
+            const value = parseFloat(this.zoomSlider.value);
+            this.zoomValueLabel.textContent = value.toFixed(1) + 'x';
+            this.scanner.setZoom(value);
+        });
 
         // Handle page visibility changes (pause scanning when app is hidden)
         document.addEventListener('visibilitychange', () => {
@@ -137,6 +149,9 @@ class BeaconScannerApp {
                 
                 // Update stop button
                 this.stopBtn.innerHTML = 'Stop Scanner';
+
+                // Set up zoom control if supported
+                this.setupZoomControl();
                 
                 console.log('Scanning started successfully');
             }, 1000);
@@ -151,6 +166,7 @@ class BeaconScannerApp {
     stopScanning() {
         this.scanner.stopScanning();
         this.resetButtonStates();
+        this.hideZoomControl();
         this.showCameraPlaceholder();
         console.log('Scanning stopped');
     }
@@ -186,6 +202,11 @@ class BeaconScannerApp {
                     Point camera at QR code
                 </div>
             </div>
+            <div class="zoom-controls" id="zoomControls" style="display: none;">
+                <span class="zoom-icon">🔍</span>
+                <input type="range" id="zoomSlider" min="1" max="5" step="0.1" value="1">
+                <span class="zoom-value" id="zoomValue">1.0x</span>
+            </div>
         `;
         
         // Update video reference and ensure it's connected
@@ -196,6 +217,45 @@ class BeaconScannerApp {
         } else {
             console.error('Failed to restore video element');
         }
+
+        // Re-bind zoom control references after DOM rebuild
+        this.zoomControls = document.getElementById('zoomControls');
+        this.zoomSlider = document.getElementById('zoomSlider');
+        this.zoomValueLabel = document.getElementById('zoomValue');
+        if (this.zoomSlider) {
+            this.zoomSlider.addEventListener('input', () => {
+                const value = parseFloat(this.zoomSlider.value);
+                this.zoomValueLabel.textContent = value.toFixed(1) + 'x';
+                this.scanner.setZoom(value);
+            });
+        }
+    }
+
+    setupZoomControl() {
+        const zoom = this.scanner.getZoomCapabilities();
+        if (!zoom.supported) return;
+
+        this.zoomSlider.min = zoom.min;
+        this.zoomSlider.max = zoom.max;
+        this.zoomSlider.step = zoom.step;
+        this.zoomSlider.value = zoom.current;
+        this.zoomValueLabel.textContent = parseFloat(zoom.current).toFixed(1) + 'x';
+        this.zoomControls.style.display = 'flex';
+    }
+
+    hideZoomControl() {
+        if (this.zoomControls) {
+            this.zoomControls.style.display = 'none';
+            this.zoomSlider.value = 1;
+            this.zoomValueLabel.textContent = '1.0x';
+        }
+    }
+
+    clearFields() {
+        this.currentMacAddress = null;
+        this.macAddressElement.textContent = '';
+        this.hideResults();
+        this.hideError();
     }
 
     handleMACAddressDetected(macAddress) {

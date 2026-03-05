@@ -303,4 +303,40 @@ class QRScanner {
         }
         return null;
     }
+
+    // Get zoom capabilities { supported, min, max, step, current }
+    getZoomCapabilities() {
+        if (!this.stream) return { supported: false };
+
+        const videoTrack = this.stream.getVideoTracks()[0];
+        if (!videoTrack || !videoTrack.getCapabilities) return { supported: false };
+
+        const capabilities = videoTrack.getCapabilities();
+        if (!capabilities.zoom) return { supported: false };
+
+        const settings = videoTrack.getSettings();
+        return {
+            supported: true,
+            min: capabilities.zoom.min ?? 1,
+            max: capabilities.zoom.max ?? 5,
+            step: capabilities.zoom.step ?? 0.1,
+            current: settings.zoom ?? capabilities.zoom.min ?? 1
+        };
+    }
+
+    // Apply zoom level to the active camera track
+    async setZoom(zoomLevel) {
+        if (!this.stream) return false;
+
+        const videoTrack = this.stream.getVideoTracks()[0];
+        if (!videoTrack) return false;
+
+        try {
+            await videoTrack.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
+            return true;
+        } catch (error) {
+            console.warn('Zoom not supported by this device/browser:', error);
+            return false;
+        }
+    }
 }

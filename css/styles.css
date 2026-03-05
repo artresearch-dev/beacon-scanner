@@ -123,6 +123,66 @@ body {
     text-align: center;
 }
 
+/* Zoom Controls */
+.zoom-controls {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.65);
+    padding: 8px 16px;
+    border-radius: 25px;
+    pointer-events: all;
+    white-space: nowrap;
+}
+
+.zoom-controls .zoom-icon {
+    font-size: 1.1rem;
+}
+
+.zoom-controls input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 130px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.35);
+    outline: none;
+    cursor: pointer;
+}
+
+.zoom-controls input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #2196F3;
+    cursor: pointer;
+    box-shadow: 0 0 4px rgba(0,0,0,0.4);
+}
+
+.zoom-controls input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #2196F3;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 4px rgba(0,0,0,0.4);
+}
+
+.zoom-value {
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 36px;
+    text-align: right;
+}
+
 /* Controls */
 .controls {
     padding: 20px;
@@ -176,6 +236,18 @@ body {
 .btn-success:hover, .btn-success:active {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #f44336, #c62828);
+    color: white;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.btn-danger:hover, .btn-danger:active {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
 }
 
 /* Results Container */
