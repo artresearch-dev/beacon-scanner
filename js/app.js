@@ -44,7 +44,7 @@ class BeaconScannerApp {
         this.copyMacBtn.addEventListener('click', () => this.copyMACAddress());
         this.copyUuidBtn.addEventListener('click', () => this.copyUUID());
         this.copyPasswordBtn.addEventListener('click', () => this.copyPassword());
-        this.clearBtn.addEventListener('click', () => this.clearFields());
+        this.clearBtn.addEventListener('click', () => this.startScanning());
 
         // Zoom slider
         this.zoomSlider.addEventListener('input', () => {
@@ -96,7 +96,7 @@ class BeaconScannerApp {
             <div class="camera-placeholder">
                 <div class="icon">📷</div>
                 <p><strong>Camera Ready</strong></p>
-                <p>Tap "Start Scanner" to begin scanning QR codes</p>
+                <p>Tap "Clear &amp; Scan Again" to begin scanning QR codes</p>
             </div>
         `;
     }
@@ -189,7 +189,7 @@ class BeaconScannerApp {
         this.startBtn.style.display = 'inline-block';
         this.stopBtn.style.display = 'none';
         this.startBtn.disabled = false;
-        this.startBtn.innerHTML = 'Start Scanner';
+        this.startBtn.innerHTML = '🗑️ Clear &amp; Scan Again';
         this.stopBtn.innerHTML = 'Stop Scanner';
     }
 
