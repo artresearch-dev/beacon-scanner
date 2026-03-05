@@ -96,7 +96,7 @@ class BeaconScannerApp {
             <div class="camera-placeholder">
                 <div class="icon">📷</div>
                 <p><strong>Camera Ready</strong></p>
-                <p>Tap "Clear &amp; Scan Again" to begin scanning QR codes</p>
+                <p>Tap "Start Scanner" to begin scanning QR codes</p>
             </div>
         `;
     }
@@ -189,7 +189,9 @@ class BeaconScannerApp {
         this.startBtn.style.display = 'inline-block';
         this.stopBtn.style.display = 'none';
         this.startBtn.disabled = false;
-        this.startBtn.innerHTML = '🗑️ Clear &amp; Scan Again';
+        this.startBtn.classList.remove('btn-danger');
+        this.startBtn.classList.add('btn-primary');
+        this.startBtn.innerHTML = 'Start Scanner';
         this.stopBtn.innerHTML = 'Stop Scanner';
     }
 
@@ -268,6 +270,11 @@ class BeaconScannerApp {
         
         // Stop scanning after successful detection
         this.stopScanning();
+
+        // Change the top button to match the bottom Clear button
+        this.startBtn.classList.remove('btn-primary');
+        this.startBtn.classList.add('btn-danger');
+        this.startBtn.innerHTML = '🗑️ Clear &amp; Scan Again';
     }
 
     async copyMACAddress() {
